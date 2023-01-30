@@ -1,0 +1,32 @@
+<html>
+  <head> </head>
+  <body>
+    <div id="root"></div>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!--<script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>-->
+    <!--<script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>-->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script type = "text/babel">
+      "use strict";
+
+      //리액트 18
+      function LikteButton()
+      {const [liked, setLiked] = React.useState(false);
+
+        //구조분해 한 행위가 위에 있는 행위
+
+        if(liked)
+        {
+          return 'you like this.';
+        }
+        return (
+          <button onClick = { () => {setLiked(true);}}> Like </button>
+        );
+      }
+    </script>
+    <script type = "text/babel">
+      ReactDOM.createRoot(document.querySelector('#root')).render(<LikteButton/>);
+    </script>
+  </body>
+</html>
