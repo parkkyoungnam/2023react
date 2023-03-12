@@ -109,6 +109,15 @@ class NumberBaseball extends Component
         });
     };
 
+    onRetry = (e) => {
+        alert('게임을 다시 시작합니다.');
+                
+        this.setState({
+            value : '',
+            ansser : getNumbers(),
+            tries : [],
+        });
+    }
 
     render() {
         return (
@@ -117,6 +126,8 @@ class NumberBaseball extends Component
                 <form onSubmit={this.onSubmitForm}>
                     <input maxLength={4} value = {this.state.value} onChange = {this.onChangeInput} />
                 </form>
+
+                <button onClick={this.onRetry}>다시하기</button>
 
                 <div> 시도 : {this.state.tries.length}</div>
                 <ul>
