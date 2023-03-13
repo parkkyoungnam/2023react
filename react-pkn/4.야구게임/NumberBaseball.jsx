@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, createRef} from 'react';
 import Try from './Try'
 
 function getNumbers()
@@ -26,32 +26,39 @@ class NumberBaseball extends Component
     }
 
     onSubmitForm = (e) => {
+        const {value, tries, answer} = this.state;
+
         e.preventDefault();
-        if(this.state.value === this.state.answer.join(''))
+        if(value === answer.join(''))
         {
-            this.setState({
-                result : '홈런',
-                tries : [...this.state.tries, {try:this.state.value, result : '홈런!'}],
-                /*
-                    배열에 값을 넣을 때 push를 쓰는데 리액트에서는 사용하면 안된다.
-                    push를 쓰면 리액트에서 값이 변했다는 감지를 하지 못한다.
-                    const array []; const array2 = ...array, 1] 이렇게 하면 참조하는 객체가 달라져서 해당 값 인지 가능
-                */
+            this.setState( (prevState) => {
+                return {
+                    result : '홈런',
+                    tries : [...prevState.tries, {try:value, result : '홈런!'}],
+                    /*
+                        배열에 값을 넣을 때 push를 쓰는데 리액트에서는 사용하면 안된다.
+                        push를 쓰면 리액트에서 값이 변했다는 감지를 하지 못한다.
+                        const array []; const array2 = ...array, 1] 이렇게 하면 참조하는 객체가 달라져서 해당 값 인지 가능
+                    */
+                }
+                
             })
 
             alert('게임을 다시 시작합니다.');
                 
             this.setState({
+                result : '',
                 value : '',
-                ansser : getNumbers(),
+                answer : getNumbers(),
                 tries : [],
             });
+            this.inputRef.current.focus();
         }
         else{
-            const answerArray = this.state.value.split('').map((v) => parseInt(v));
+            const answerArray = value.split('').map((v) => parseInt(v));
             let strike = 0;
             let ball = 0;
-            if(this.state.tries.length >= 9)
+            if(tries.length >= 9)
             {
                 this.setState({
                     result : `10번 넘게 틀려서 실패! 답은 ${answer.join(',')}였습니다!`,
@@ -60,26 +67,38 @@ class NumberBaseball extends Component
                 alert('게임을 다시 시작합니다.');
                 
                 this.setState({
+                    result : '',
                     value : '',
-                    ansser : getNumbers(),
+                    answer : getNumbers(),
                     tries : [],
                 });
+                this.inputRef.current.focus();
             }
             else
             {
                 for(let i = 0; i<4; i+=1) {
-                    if(answerArray[i] === this.state.answer[i])
+                    if(answerArray[i] === answer[i])
                     {
                         strike += 1;
                     }
-                    else if (this.state.answer.includes(answerArray[i]))
+                    else if (answer.includes(answerArray[i]))
                     {
                         ball += 1;
                     }
                 }
-                this.setState({
-                    tries : [...this.state.tries,{try : this.state.value, result : `${strike} 스트라이크, ${ball} 볼`}]
+
+                this.setState( (prevState) => {
+                    return {
+                        tries: [...prevState.tries, { try: value, result: `${strike} 스트라이크, ${ball} 볼입니다`}],
+                        value : '',
+                        /*
+                            배열에 값을 넣을 때 push를 쓰는데 리액트에서는 사용하면 안된다.
+                            push를 쓰면 리액트에서 값이 변했다는 감지를 하지 못한다.
+                            const array []; const array2 = ...array, 1] 이렇게 하면 참조하는 객체가 달라져서 해당 값 인지 가능
+                        */
+                    } 
                 })
+                this.inputRef.current.focus();
             }
         }
         
@@ -109,30 +128,35 @@ class NumberBaseball extends Component
         });
     };
 
+    inputRef = createRef(); // this.inputRef
+
     onRetry = (e) => {
         alert('게임을 다시 시작합니다.');
                 
         this.setState({
+            result : '',
             value : '',
-            ansser : getNumbers(),
+            answer : getNumbers(),
             tries : [],
         });
     }
 
     render() {
+        const { result, value, tries } = this.state;
+
         return (
             <>
-                <h1>{this.state.result}</h1>
+                <h1>{result}</h1>
                 <form onSubmit={this.onSubmitForm}>
-                    <input maxLength={4} value = {this.state.value} onChange = {this.onChangeInput} />
+                    <input ref={this.inputRef} maxLength={4} value={value} onChange={this.onChangeInput} />
                 </form>
 
                 <button onClick={this.onRetry}>다시하기</button>
 
-                <div> 시도 : {this.state.tries.length}</div>
+                <div> 시도 : {tries.length}</div>
                 <ul>
                     {
-                        this.state.tries.map( (v, i) => {
+                        tries.map( (v, i) => {
                             return (
                                 /*<li key = {v.fruit}> <b>{v.fruit}</b> - {v.taste}</li>*/
                                 <Try key = {`${i+1}차 시도 : `} tryInfo = {v} />
